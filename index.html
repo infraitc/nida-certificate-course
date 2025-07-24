@@ -194,92 +194,19 @@
         }
 
         .certificate {
-            width: 850px;
-            height: 600px;
-            background: white;
+            width: 1200px;
+            max-width: 95vw;
             margin: 50px auto;
-            position: relative;
+            background: white;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
             border-radius: 10px;
+            padding: 20px;
         }
 
-        .certificate-border {
-            position: absolute;
-            inset: 20px;
-            border: 3px solid #667eea;
-            border-radius: 10px;
-        }
-
-        .certificate-content {
-            position: relative;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 60px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23667eea" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
-            background-size: cover;
-        }
-
-        .certificate-logo {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .certificate h2 {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .certificate-text {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .certificate-name {
-            font-size: 2.5rem;
-            color: #333;
-            font-weight: 700;
-            margin: 20px 0;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-            display: inline-block;
-        }
-
-        .certificate-footer {
-            position: absolute;
-            bottom: 60px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-around;
-            padding: 0 100px;
-        }
-
-        .signature-block {
-            text-align: center;
-        }
-
-        .signature-line {
-            width: 200px;
-            height: 2px;
-            background: #333;
-            margin: 40px auto 10px;
-        }
-
-        .certificate-date {
-            position: absolute;
-            top: 40px;
-            right: 60px;
-            font-size: 1rem;
-            color: #666;
+        #certificate-svg {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
         .download-btn {
@@ -325,25 +252,7 @@
         @media (max-width: 768px) {
             .certificate {
                 width: 100%;
-                max-width: 600px;
-                height: auto;
-                min-height: 500px;
-            }
-            
-            .certificate-content {
-                padding: 40px 20px;
-            }
-            
-            .certificate h2 {
-                font-size: 2rem;
-            }
-            
-            .certificate-name {
-                font-size: 1.8rem;
-            }
-            
-            .certificate-footer {
-                padding: 0 40px;
+                max-width: 900px;
             }
         }
     </style>
@@ -439,36 +348,11 @@
     <div id="certificate-container">
         <button class="close-btn" onclick="closeCertificate()">×</button>
         <div class="certificate" id="certificate">
-            <div class="certificate-border"></div>
-            <div class="certificate-content">
-                <div class="certificate-date" id="cert-date"></div>
-                <div class="certificate-logo">🏆</div>
-                <h2>Certificate of Completion</h2>
-                <p class="certificate-text">This is to certify that</p>
-                <div class="certificate-name" id="cert-name"></div>
-                <p class="certificate-text">
-                    has successfully completed the training course<br>
-                    <strong>"AI เพื่อการทำงานยุคใหม่"</strong><br>
-                    and demonstrated proficiency in understanding<br>
-                    artificial intelligence applications in modern workplace
-                </p>
-                
-                <div class="certificate-footer">
-                    <div class="signature-block">
-                        <div class="signature-line"></div>
-                        <p>วิทยากร</p>
-                    </div>
-                    <div class="signature-block">
-                        <div class="signature-line"></div>
-                        <p>ผู้อำนวยการหลักสูตร</p>
-                    </div>
-                </div>
-            </div>
+            <div id="certificate-svg-container"></div>
         </div>
         <button class="download-btn" onclick="downloadCertificate()">ดาวน์โหลด Certificate</button>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         // Star rating
         const stars = document.querySelectorAll('.star');
@@ -526,37 +410,86 @@
             showCertificate(fullname);
         });
         
-        function showCertificate(name) {
-            document.getElementById('cert-name').textContent = name;
-            document.getElementById('cert-date').textContent = new Date().toLocaleDateString('th-TH', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('certificate-container').style.display = 'block';
-            
-            // Animate certificate
-            setTimeout(() => {
-                document.querySelector('.certificate').style.animation = 'slideIn 0.5s ease-out';
-            }, 100);
+        async function showCertificate(name) {
+            // Load SVG file
+            try {
+                const response = await fetch('certificate.svg');
+                const svgText = await response.text();
+                
+                // Insert SVG into container
+                document.getElementById('certificate-svg-container').innerHTML = svgText;
+                
+                // Update name in SVG
+                const nameElement = document.querySelector('#certificate-svg-container #name');
+                if (nameElement) {
+                    nameElement.textContent = name;
+                }
+                
+                // Show certificate container
+                document.getElementById('certificate-container').style.display = 'block';
+                
+                // Animate certificate
+                setTimeout(() => {
+                    document.querySelector('.certificate').style.animation = 'slideIn 0.5s ease-out';
+                }, 100);
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+                alert('ไม่สามารถโหลดไฟล์ certificate.svg ได้ กรุณาตรวจสอบว่าไฟล์อยู่ในโฟลเดอร์เดียวกับ index.html');
+            }
         }
         
         function closeCertificate() {
             document.getElementById('certificate-container').style.display = 'none';
         }
         
-        function downloadCertificate() {
-            const certificate = document.getElementById('certificate');
+        async function downloadCertificate() {
+            const svgElement = document.querySelector('#certificate-svg-container svg');
             
-            html2canvas(certificate, {
-                scale: 2,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'AI_Training_Certificate.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
+            if (!svgElement) {
+                alert('ไม่พบ Certificate');
+                return;
+            }
+            
+            // Clone SVG to avoid modifying the original
+            const clonedSvg = svgElement.cloneNode(true);
+            
+            // Get SVG string
+            const svgString = new XMLSerializer().serializeToString(clonedSvg);
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size (adjust based on your SVG dimensions)
+            canvas.width = 1920;
+            canvas.height = 1080;
+            
+            // Create image from SVG
+            const img = new Image();
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                // Fill white background
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw image
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Download as PNG
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = 'AI_Training_Certificate_NIDA.png';
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            img.src = url;
         }
         
         // Close certificate on background click
